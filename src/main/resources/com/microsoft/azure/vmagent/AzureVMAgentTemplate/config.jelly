@@ -134,6 +134,9 @@
             <f:entry title="${%JVM_Options}" field="jvmOptions" help="/plugin/azure-vm-agents/help-jvmOptions.html">
                 <f:textbox/>
             </f:entry>
+             <f:entry title="${%Tunnel}" field="tunnel" help="/plugin/azure-vm-agents/help-tunnel.html">
+                            <f:textbox/>
+                        </f:entry>
 
             <f:entry title="${%noOfParallelJobs}" field="noOfParallelJobs"
                      help="/plugin/azure-vm-agents/help-noOfParallelJobs.html">

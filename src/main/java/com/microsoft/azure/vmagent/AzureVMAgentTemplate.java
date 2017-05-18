@@ -130,6 +130,7 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate> {
     private final String nsgName;
 
     private final String jvmOptions;
+    private final String tunnel;
 
     // Indicates whether the template is disabled.
     // If disabled, will not attempt to verify or use
@@ -174,6 +175,7 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate> {
             final String nsgName,
             final String agentWorkspace,
             final String jvmOptions,
+            final String tunnel,
             final String retentionTimeInMin,
             final boolean shutdownOnIdle,
             final boolean templateDisabled,
@@ -212,6 +214,7 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate> {
         this.nsgName = nsgName;
         this.agentWorkspace = agentWorkspace;
         this.jvmOptions = jvmOptions;
+        this.tunnel = tunnel;
         this.executeInitScriptAsRoot = executeInitScriptAsRoot;
         this.doNotUseMachineIfInitFails = doNotUseMachineIfInitFails;
         if (StringUtils.isBlank(retentionTimeInMin) || !retentionTimeInMin.matches(Constants.REG_EX_DIGIT)) {
@@ -320,7 +323,7 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate> {
     public String getCredentialsId() {
         return credentialsId;
     }
-
+    public String getTunnel(){return tunnel;}
     public StandardUsernamePasswordCredentials getVMCredentials() throws AzureCloudException {
         return AzureUtil.getCredentials(credentialsId);
     }
@@ -511,6 +514,7 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate> {
                 subnetName,
                 retentionTimeInMin + "",
                 jvmOptions,
+                tunnel,
                 getResourceGroupName(),
                 true,
                 usePrivateIP,
@@ -715,6 +719,7 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate> {
                 @QueryParameter String nsgName,
                 @QueryParameter String retentionTimeInMin,
                 @QueryParameter String jvmOptions,
+                @QueryParameter String tunnel,
                 @QueryParameter String imageReferenceType) {
 
             /*
@@ -757,7 +762,8 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate> {
                             + "privateIP: {22};\n\t"
                             + "nsgName: {23};\n\t"
                             + "retentionTimeInMin: {24};\n\t"
-                            + "jvmOptions: {25};",
+                            + "jvmOptions: {25};\n\t"
+                            + "tunnel: {26};",
                     new Object[]{
                             servicePrincipal.getSubscriptionId(),
                             (StringUtils.isNotBlank(servicePrincipal.getClientId()) ? "********" : null),
@@ -784,7 +790,8 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate> {
                             usePrivateIP,
                             nsgName,
                             retentionTimeInMin,
-                            jvmOptions});
+                            jvmOptions,
+                            tunnel});
 
             // First validate the subscription info.  If it is not correct,
             // then we can't validate the 
@@ -816,6 +823,7 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate> {
                     subnetName,
                     retentionTimeInMin,
                     jvmOptions,
+                    tunnel,
                     resourceGroupName,
                     false,
                     usePrivateIP,

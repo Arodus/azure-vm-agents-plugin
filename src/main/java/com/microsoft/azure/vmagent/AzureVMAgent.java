@@ -21,6 +21,7 @@ import com.microsoft.azure.vmagent.remote.AzureVMAgentSSHLauncher;
 import com.microsoft.azure.vmagent.util.CleanUpAction;
 import com.microsoft.azure.vmagent.util.Constants;
 import hudson.Extension;
+import hudson.Launcher;
 import hudson.model.Descriptor.FormException;
 import hudson.model.TaskListener;
 import hudson.slaves.AbstractCloudComputer;
@@ -59,6 +60,7 @@ public class AzureVMAgent extends AbstractCloudSlave {
     private final String sshPassPhrase;
 
     private final String jvmOptions;
+    private final String tunnel;
 
     private boolean shutdownOnIdle;
 
@@ -117,6 +119,7 @@ public class AzureVMAgent extends AbstractCloudSlave {
             final String sshPrivateKey,
             final String sshPassPhrase,
             final String jvmOptions,
+            final String tunnel,
             final boolean shutdownOnIdle,
             final boolean eligibleForReuse,
             final String deploymentName,
@@ -141,6 +144,7 @@ public class AzureVMAgent extends AbstractCloudSlave {
         this.sshPrivateKey = sshPrivateKey;
         this.sshPassPhrase = sshPassPhrase;
         this.jvmOptions = jvmOptions;
+        this.tunnel =  tunnel;
         this.shutdownOnIdle = shutdownOnIdle;
         this.eligibleForReuse = eligibleForReuse;
         this.deploymentName = deploymentName;
@@ -170,6 +174,7 @@ public class AzureVMAgent extends AbstractCloudSlave {
             final String sshPrivateKey,
             final String sshPassPhrase,
             final String jvmOptions,
+            final String tunnel,
             final boolean shutdownOnIdle,
             final boolean eligibleForReuse,
             final String deploymentName,
@@ -184,6 +189,9 @@ public class AzureVMAgent extends AbstractCloudSlave {
             final boolean executeInitScriptAsRoot,
             final boolean doNotUseMachineIfInitFails) throws FormException, IOException {
 
+
+
+
         this(name,
                 templateName,
                 nodeDescription,
@@ -193,7 +201,7 @@ public class AzureVMAgent extends AbstractCloudSlave {
                 mode,
                 label,
                 agentLaunchMethod.equalsIgnoreCase("SSH") ?
-                        new AzureVMAgentSSHLauncher() : new JNLPLauncher(),
+                        new AzureVMAgentSSHLauncher() : new JNLPLauncher(tunnel,null),
                 new AzureVMCloudRetensionStrategy(retentionTimeInMin),
                 Collections.<NodeProperty<?>>emptyList(),
                 cloudName,
@@ -201,6 +209,7 @@ public class AzureVMAgent extends AbstractCloudSlave {
                 sshPrivateKey,
                 sshPassPhrase,
                 jvmOptions,
+                tunnel,
                 shutdownOnIdle,
                 eligibleForReuse,
                 deploymentName,
@@ -257,6 +266,10 @@ public class AzureVMAgent extends AbstractCloudSlave {
 
     public Localizable getCleanUpReason() {
         return cleanUpReason;
+    }
+
+    public String getTunnel(){
+        return this.tunnel;
     }
 
     /**
@@ -479,6 +492,7 @@ public class AzureVMAgent extends AbstractCloudSlave {
                 + "\n\tcloudName=" + cloudName
                 + "\n\tVMCredentialsId=" + vmCredentialsId
                 + "\n\tjvmOptions=" + jvmOptions
+                + "\n\ttunnel=" + tunnel
                 + "\n\tshutdownOnIdle=" + shutdownOnIdle
                 + "\n\tretentionTimeInMin=" + retentionTimeInMin
                 + "\n\tagentLaunchMethod=" + agentLaunchMethod

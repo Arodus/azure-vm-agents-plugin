@@ -619,6 +619,7 @@ public class AzureVMManagementServiceDelegate {
                     null,
                     null,
                     template.getJvmOptions(),
+                    template.getTunnel(),
                     template.isShutdownOnIdle(),
                     false,
                     deploymentName,
@@ -1203,6 +1204,7 @@ public class AzureVMManagementServiceDelegate {
             final String subnetName,
             final String retentionTimeInMin,
             final String jvmOptions,
+            final String tunnel,
             final String resourceGroupName,
             final boolean returnOnSingleError,
             final boolean usePrivateIP,
@@ -1244,11 +1246,18 @@ public class AzureVMManagementServiceDelegate {
             }
 
             //verify JVM Options
-            validationResult = verifyJvmOptions(jvmOptions);
+           validationResult = verifyJvmOptions(jvmOptions);
             addValidationResultIfFailed(validationResult, errors);
             if (returnOnSingleError && errors.size() > 0) {
                 return errors;
             }
+            validationResult = verifyTunnel(tunnel);
+            addValidationResultIfFailed(validationResult, errors);
+            if (returnOnSingleError && errors.size() > 0) {
+                return errors;
+            }
+
+
 
             validationResult = verifyImageParameters(referenceType, image, osType, imagePublisher, imageOffer, imageSku, imageVersion);
             addValidationResultIfFailed(validationResult, errors);
@@ -1542,6 +1551,14 @@ public class AzureVMManagementServiceDelegate {
             return Constants.OP_SUCCESS;
         } else {
             return Messages.Azure_GC_JVM_Option_Err();
+        }
+    }
+
+    private static String verifyTunnel(final String tunnel) {
+        if(StringUtils.isBlank(tunnel) || tunnel.contains(":")) {
+            return Constants.OP_SUCCESS;
+        }else{
+            return Messages.AZURE_GC_TUNNEL_ERR();
         }
     }
 
